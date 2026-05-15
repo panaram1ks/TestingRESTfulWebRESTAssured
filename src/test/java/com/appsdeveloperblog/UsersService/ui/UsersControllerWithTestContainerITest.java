@@ -185,4 +185,30 @@ public class UsersControllerWithTestContainerITest {
         Assertions.assertNotNull(token);
     }
 
+    @Order(5)
+    @Test
+    void testGetUser_whenValidToken_returnsUser(){
+        // Arrange
+        Headers headers = new Headers(
+                new Header("Authorization", "Bearer " + token)
+        );
+        // Act
+        given()
+    //                    .headers(headers) // first var
+                    .auth().oauth2(token) // more preferable
+                    .pathParam("userId", userId)
+                .when()
+                    .get("/users/{userId}")
+                .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("id", equalTo(userId))
+                    .body("email", equalTo(TEST_LOGIN))
+//                    .body("firsName", notNullValue())
+//                    .body("lastName", notNullValue())
+        ;
+        // Assert
+//        Assertions.assertEquals(HttpStatus.OK.value(), response.statusCode());
+
+    }
+
 }
