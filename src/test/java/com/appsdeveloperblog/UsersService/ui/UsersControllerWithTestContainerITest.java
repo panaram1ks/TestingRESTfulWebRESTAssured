@@ -116,6 +116,7 @@ public class UsersControllerWithTestContainerITest {
         .when()
                 .post("/users")
         .then()
+                .log().all()
                 .statusCode(201)
                 .body("id", notNullValue())
                 .body("firstName", equalTo(newUser.getFirstName()))
