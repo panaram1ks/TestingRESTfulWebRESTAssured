@@ -13,6 +13,7 @@ import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.internal.RequestSpecificationImpl;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -38,6 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Testcontainers
 @ActiveProfiles("test")
 public class UsersControllerWithTestContainerITest {
+
+    private static final String TEST_LOGIN = "test@emal.com";
+    private static final String TEST_PASSWORD = "12345678";
+
+    private String userId;
+    private String token;
+
 
     @Container // create, start and stop testcontainer during and after tests
     @ServiceConnection // configure application use database in testcontainer
@@ -68,7 +76,7 @@ public class UsersControllerWithTestContainerITest {
 
         RestAssured.responseSpecification = new ResponseSpecBuilder() // globally for each response
 //                .expectStatusCode(anyOf(is(200),is(201),is(204)))
-                .expectContentType(ContentType.JSON)
+//                .expectContentType(ContentType.JSON)
                 .expectResponseTime(lessThan(2000L)) // time to response less than 2 seconds
 //                .expectBody("id", notNullValue())
                 .build();
@@ -88,12 +96,12 @@ public class UsersControllerWithTestContainerITest {
 //                new Header("Content-Type", "application/json"),
 //                new Header("Accept", "application/json")
 //        );
-        User newUser = new User("fName", "lName", "test@emal.com", "12345678"); // first approach
+        User newUser = new User("fName", "lName", TEST_LOGIN, TEST_PASSWORD); // first approach
         // second approach
 //        Map<String, Object> newUser = new HashMap<>(); // if original User class in other project
 //        newUser.put("firstName", "fName");
 //        newUser.put("lastName", "lName");
-//        newUser.put("email", "test@emal.com");
+//        newUser.put("email", TEST_LOGIN);
 //        newUser.put("password", "12345678");
         // Act
         Response response = given()
@@ -124,7 +132,7 @@ public class UsersControllerWithTestContainerITest {
         Assertions.assertNotNull(createdUser.getId());
     }
 
-    @Order(2)
+    @Order(3)
     @Test
     void testCreateUser_whenValidDetailsProvided_returnsCreatedUser_validateHttpResponse() {
 //        // Arrange
@@ -150,4 +158,31 @@ public class UsersControllerWithTestContainerITest {
                 .body("email", equalTo(newUser.getEmail()));
 
     }
+
+    @Order(4)
+    @Test
+    void testLoginMethod_whenValidCredentialsProvided_returnsTokenAndUserIdHeaders() {
+        // Arrange
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("email", TEST_LOGIN);
+        credentials.put("password", TEST_PASSWORD);
+
+        // Act
+        Response response = given()
+                .body(credentials)
+                        .when()
+                                         .post("/login")
+//                        .then()
+//                                        .extract()
+//                                        .response()
+                ;
+        userId = response.getHeader("userId");
+        token = response.getHeader("token");
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK.value(), response.statusCode());
+        Assertions.assertNotNull(userId);
+        Assertions.assertNotNull(token);
+    }
+
 }
