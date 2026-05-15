@@ -211,4 +211,15 @@ public class UsersControllerWithTestContainerITest {
 
     }
 
+    @Order(6)
+    @Test
+    void testGetUser_whenNoToken_returnsForbidden(){
+        given()
+                    .pathParam("userId", userId)
+                .when()
+                    .get("/users/{userId}")
+                .then()
+                    .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
 }
