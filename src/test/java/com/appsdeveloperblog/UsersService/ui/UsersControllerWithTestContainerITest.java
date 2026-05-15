@@ -6,11 +6,13 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -66,20 +68,29 @@ public class UsersControllerWithTestContainerITest {
 //        newUser.put("email", "test@emal.com");
 //        newUser.put("password", "12345678");
         // Act
-        UserRest createdUser = given()
-            ////                .header("Content-Type", "application/json")
-            //                .contentType(ContentType.JSON)
-            ////                .header("Accept", "application/json")
-            //                .accept(ContentType.JSON)
-                            .headers(headers)
-                            .body(newUser)
+        Response response = given()
+                ////                .header("Content-Type", "application/json")
+                //                .contentType(ContentType.JSON)
+                ////                .header("Accept", "application/json")
+                //                .accept(ContentType.JSON)
+                .headers(headers)
+                .body(newUser)
                 .when()
-                              .post("/users")
+                .post("/users")
                 .then()
-                            .extract()
-                            .as(UserRest.class);
+                .extract()
+//                            .as(UserRest.class);
+                .response();
         // Assert
-        Assertions.assertEquals(newUser.getFirstName(), createdUser.getFirstName());
+//        Assertions.assertEquals(newUser.getFirstName(), createdUser.getFirstName());
+//        Assertions.assertEquals(newUser.getLastName(), createdUser.getLastName());
+//        Assertions.assertEquals(newUser.getEmail(), createdUser.getEmail());
+//        Assertions.assertNotNull(createdUser.getId());
+
+        UserRest createdUser = response.as(UserRest.class);
+        Assertions.assertEquals(HttpStatus.CREATED.value(), response.statusCode());
+
+        Assertions.assertEquals(newUser.getFirstName(), response.jsonPath().getString("firstName"));
         Assertions.assertEquals(newUser.getLastName(), createdUser.getLastName());
         Assertions.assertEquals(newUser.getEmail(), createdUser.getEmail());
         Assertions.assertNotNull(createdUser.getId());
