@@ -4,6 +4,7 @@ import com.appsdeveloperblog.UsersService.ui.model.User;
 import com.appsdeveloperblog.UsersService.ui.model.UserRest;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -28,8 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -64,6 +64,13 @@ public class UsersControllerWithTestContainerITest {
                 .setAccept(ContentType.JSON)
                 .addFilter(requestLoggingFilter)
                 .addFilter(responseLoggingFilter)
+                .build();
+
+        RestAssured.responseSpecification = new ResponseSpecBuilder() // globally for each response
+//                .expectStatusCode(anyOf(is(200),is(201),is(204)))
+                .expectContentType(ContentType.JSON)
+                .expectResponseTime(lessThan(2000L)) // time to response less than 2 seconds
+//                .expectBody("id", notNullValue())
                 .build();
     }
 
