@@ -1,5 +1,6 @@
 package com.appsdeveloperblog.UsersService.ui;
 
+import com.appsdeveloperblog.UsersService.ui.model.User;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
@@ -13,6 +14,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.net.http.HttpHeaders;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,6 +45,13 @@ public class UsersControllerWithTestContainerITest {
                 new Header("Content-Type", "application/json"),
                 new Header("Accept", "application/json")
         );
+        User newUser = new User("fName", "lName", "test@emal.com", "12345678"); // first approach
+        // second approach
+//        Map<String, Object> newUser = new HashMap<>(); // if original User class in other project
+//        newUser.put("firstName", "fName");
+//        newUser.put("lastName", "lName");
+//        newUser.put("email", "test@emal.com");
+//        newUser.put("password", "12345678");
         // Act
         given()
 ////                .header("Content-Type", "application/json")
@@ -49,6 +59,7 @@ public class UsersControllerWithTestContainerITest {
 ////                .header("Accept", "application/json")
 //                .accept(ContentType.JSON)
                 .headers(headers)
+                .body(newUser)
                 .when()
                 .then();
         // Assert
