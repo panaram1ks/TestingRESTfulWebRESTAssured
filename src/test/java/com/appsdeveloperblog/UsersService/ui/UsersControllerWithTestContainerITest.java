@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -94,5 +96,30 @@ public class UsersControllerWithTestContainerITest {
         Assertions.assertEquals(newUser.getLastName(), createdUser.getLastName());
         Assertions.assertEquals(newUser.getEmail(), createdUser.getEmail());
         Assertions.assertNotNull(createdUser.getId());
+    }
+
+    @Order(2)
+    @Test
+    void testCreateUser_whenValidDetailsProvided_returnsCreatedUser_validateHttpResponse() {
+        // Arrange
+        Headers headers = new Headers(
+                new Header("Content-Type", "application/json"),
+                new Header("Accept", "application/json")
+        );
+        User newUser = new User("fName2", "lName2", "test@emal2.com", "123456789"); // first approach
+
+        // Act
+        given()
+                .headers(headers)
+                .body(newUser)
+        .when()
+                .post("/users")
+        .then()
+                .statusCode(201)
+                .body("id", notNullValue())
+                .body("firstName", equalTo(newUser.getFirstName()))
+                .body("lastName", equalTo(newUser.getLastName()))
+                .body("email", equalTo(newUser.getEmail()));
+
     }
 }
