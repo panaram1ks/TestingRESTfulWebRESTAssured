@@ -110,6 +110,7 @@ public class UsersControllerWithTestContainerITest {
 
         // Act
         given()
+                .log().all()
                 .headers(headers)
                 .body(newUser)
         .when()
