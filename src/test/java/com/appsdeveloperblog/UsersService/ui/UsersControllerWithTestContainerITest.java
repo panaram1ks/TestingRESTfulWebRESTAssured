@@ -1,5 +1,8 @@
 package com.appsdeveloperblog.UsersService.ui;
 
+import io.restassured.http.ContentType;
+import io.restassured.http.Header;
+import io.restassured.http.Headers;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -9,6 +12,9 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.net.http.HttpHeaders;
+
+import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -28,5 +34,24 @@ public class UsersControllerWithTestContainerITest {
         assertTrue(mysqlContainer.isRunning());
     }
 
+    @Order(2)
+    @Test
+    void testCreateUser_whenValidDetailsProvided_returnsCreatedUser() {
+        // Arrange
+        Headers headers = new Headers(
+                new Header("Content-Type", "application/json"),
+                new Header("Accept", "application/json")
+        );
+        // Act
+        given()
+////                .header("Content-Type", "application/json")
+//                .contentType(ContentType.JSON)
+////                .header("Accept", "application/json")
+//                .accept(ContentType.JSON)
+                .headers(headers)
+                .when()
+                .then();
+        // Assert
 
+    }
 }
