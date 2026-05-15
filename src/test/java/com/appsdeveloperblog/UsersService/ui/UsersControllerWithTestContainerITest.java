@@ -1,6 +1,7 @@
 package com.appsdeveloperblog.UsersService.ui;
 
 import com.appsdeveloperblog.UsersService.ui.model.User;
+import com.appsdeveloperblog.UsersService.ui.model.UserRest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
@@ -65,19 +66,22 @@ public class UsersControllerWithTestContainerITest {
 //        newUser.put("email", "test@emal.com");
 //        newUser.put("password", "12345678");
         // Act
-        given()
-////                .header("Content-Type", "application/json")
-//                .contentType(ContentType.JSON)
-////                .header("Accept", "application/json")
-//                .accept(ContentType.JSON)
-                .headers(headers)
-                .body(newUser)
-
+        UserRest createdUser = given()
+            ////                .header("Content-Type", "application/json")
+            //                .contentType(ContentType.JSON)
+            ////                .header("Accept", "application/json")
+            //                .accept(ContentType.JSON)
+                            .headers(headers)
+                            .body(newUser)
                 .when()
-                .post("/users")
-
-                .then();
+                              .post("/users")
+                .then()
+                            .extract()
+                            .as(UserRest.class);
         // Assert
-
+        Assertions.assertEquals(newUser.getFirstName(), createdUser.getFirstName());
+        Assertions.assertEquals(newUser.getLastName(), createdUser.getLastName());
+        Assertions.assertEquals(newUser.getEmail(), createdUser.getEmail());
+        Assertions.assertNotNull(createdUser.getId());
     }
 }
