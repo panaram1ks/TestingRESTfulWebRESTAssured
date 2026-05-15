@@ -3,12 +3,14 @@ package com.appsdeveloperblog.UsersService.ui;
 import com.appsdeveloperblog.UsersService.ui.model.User;
 import com.appsdeveloperblog.UsersService.ui.model.UserRest;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
+import io.restassured.internal.RequestSpecificationImpl;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,7 +57,14 @@ public class UsersControllerWithTestContainerITest {
         RestAssured.baseURI = "http://localhost";
 //        RestAssured.port=8080;
         RestAssured.port = this.port;
-        RestAssured.filters(requestLoggingFilter, responseLoggingFilter);
+//        RestAssured.filters(requestLoggingFilter, responseLoggingFilter);
+
+        RestAssured.requestSpecification = new RequestSpecBuilder() // set global setting to request
+                .setContentType(ContentType.JSON)
+                .setAccept(ContentType.JSON)
+                .addFilter(requestLoggingFilter)
+                .addFilter(responseLoggingFilter)
+                .build();
     }
 
     @Order(1)
@@ -67,11 +76,11 @@ public class UsersControllerWithTestContainerITest {
     @Order(2)
     @Test
     void testCreateUser_whenValidDetailsProvided_returnsCreatedUser() {
-        // Arrange
-        Headers headers = new Headers(
-                new Header("Content-Type", "application/json"),
-                new Header("Accept", "application/json")
-        );
+//        // Arrange
+//        Headers headers = new Headers(
+//                new Header("Content-Type", "application/json"),
+//                new Header("Accept", "application/json")
+//        );
         User newUser = new User("fName", "lName", "test@emal.com", "12345678"); // first approach
         // second approach
 //        Map<String, Object> newUser = new HashMap<>(); // if original User class in other project
@@ -85,7 +94,7 @@ public class UsersControllerWithTestContainerITest {
                 //                .contentType(ContentType.JSON)
                 ////                .header("Accept", "application/json")
                 //                .accept(ContentType.JSON)
-                .headers(headers)
+//                .headers(headers)
                 .body(newUser)
                 .when()
                 .post("/users")
@@ -111,17 +120,17 @@ public class UsersControllerWithTestContainerITest {
     @Order(2)
     @Test
     void testCreateUser_whenValidDetailsProvided_returnsCreatedUser_validateHttpResponse() {
-        // Arrange
-        Headers headers = new Headers(
-                new Header("Content-Type", "application/json"),
-                new Header("Accept", "application/json")
-        );
+//        // Arrange
+//        Headers headers = new Headers(
+//                new Header("Content-Type", "application/json"),
+//                new Header("Accept", "application/json")
+//        );
         User newUser = new User("fName2", "lName2", "test@emal2.com", "123456789"); // first approach
 
         // Act
         given()
 //                .log().all() // log request info use requestLoggingFilter instead!
-                .headers(headers)
+//                .headers(headers)
                 .body(newUser)
         .when()
                 .post("/users")
