@@ -222,4 +222,25 @@ public class UsersControllerWithTestContainerITest {
                     .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
+    @Order(7)
+    @Test
+    void testGetUsers_whenValidTokenAndQueryParameters_returnsPaginatedUserList(){
+       // Arrange
+        Map<String, Object> params = new HashMap<>();
+        params.put("page", 1);
+        params.put("limit", 10);
+
+        // Act & Assert
+        given()
+                .log().all()
+                .auth().oauth2(token)
+                .params(params) // queryParameters or formParameters based on Get or Post method
+             .when()
+                .log().all()
+                .get("/users")
+             .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("size()", equalTo(2));
+    }
+
 }
